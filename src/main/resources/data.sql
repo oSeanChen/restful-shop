@@ -21,3 +21,23 @@ VALUES ('Wireless Mouse', 1, 1, 24.99, 150, FALSE),
        ('Portable SSD', 3, 2, 159.99, 60, FALSE),
        ('Wireless Earbuds', 1, 1, 199.99, 80, FALSE),
        ('Laptop Stand', 2, 3, 39.99, 100, FALSE);
+
+
+INSERT INTO users (username, password, email)
+VALUES
+    ('sean', 'sean123', 'sean@123.com'),
+    ('tom', 'tom123','sean@123.com');
+
+
+INSERT INTO roles (role_name)
+VALUES
+    ('ROLE_ADMIN'),
+    ('ROLE_BUYER'),
+    ('ROLE_SELLER');
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    (1, 1),
+    (1, 2),
+    (2, 2),
+    (2, 3);

@@ -52,7 +52,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Product> deleteProduct(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
         Optional<Product> product = productService.getProductById(id);
         if (product.isPresent()) {
             productService.deleteProductById(id);

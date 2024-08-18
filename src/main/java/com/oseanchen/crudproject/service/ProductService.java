@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,32 +29,24 @@ public class ProductService {
         return productDao.findById(id);
     }
 
+    @Transactional
     public Product updateProduct(Integer id, ProductRequest productRequest) {
         Optional<Product> product = getProductById(id);
         if (product.isPresent()) {
-            Product updatedProduct = product.get();
-            updatedProduct.setProductName(productRequest.getProductName());
-            updatedProduct.setUnitPrice(productRequest.getUnitPrice());
-            updatedProduct.setUnitsInStock(productRequest.getUnitsInStock());
-            updatedProduct.setDiscontinued(productRequest.getDiscontinued());
-            updatedProduct.setSupplier(productRequest.getSupplier());
-            updatedProduct.setCategory(productRequest.getCategory());
+            Product updatedProduct = converToModel(productRequest);
+            updatedProduct.setId(id);
             return productDao.save(updatedProduct);
         }
         return null;
     }
 
+    @Transactional
     public Product createProduct(ProductRequest productRequest) {
-        Product product = new Product();
-        product.setProductName(productRequest.getProductName());
-        product.setUnitPrice(productRequest.getUnitPrice());
-        product.setUnitsInStock(productRequest.getUnitsInStock());
-        product.setDiscontinued(productRequest.getDiscontinued());
-        product.setSupplier(productRequest.getSupplier());
-        product.setCategory(productRequest.getCategory());
+        Product product = converToModel(productRequest);
         return productDao.save(product);
     }
 
+    @Transactional
     public void deleteProductById(Integer id) {
         productDao.deleteById(id);
     }
@@ -75,5 +68,16 @@ public class ProductService {
 
         List<Product> products = productPage.getContent();
         return products;
+    }
+
+    private Product converToModel(ProductRequest productRequest) {
+        Product product = new Product();
+        product.setProductName(productRequest.getProductName());
+        product.setUnitPrice(productRequest.getUnitPrice());
+        product.setUnitsInStock(productRequest.getUnitsInStock());
+        product.setDiscontinued(productRequest.getDiscontinued());
+        product.setSupplier(productRequest.getSupplier());
+        product.setCategory(productRequest.getCategory());
+        return product;
     }
 }
