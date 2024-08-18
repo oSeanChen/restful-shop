@@ -5,6 +5,7 @@ import com.oseanchen.crudproject.dao.UserDao;
 import com.oseanchen.crudproject.dto.UserRequest;
 import com.oseanchen.crudproject.model.Role;
 import com.oseanchen.crudproject.model.User;
+import com.oseanchen.crudproject.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class UserService {
     @Transactional
     public User createUser(UserRequest userRequest) {
         Set<Role> roles = new HashSet<>();
-        List<String> roleList = Arrays.asList("ROLE_BUYER", "ROLE_SELLER");
+        List<String> roleList = Arrays.asList(UserRole.ROLE_BUYER.name(), UserRole.ROLE_SELLER.name());
         for (String role : roleList) {
             Role defaultRole = roleDao.findByRoleName(role)
                     .orElseThrow(() -> new RuntimeException("Default role not found"));

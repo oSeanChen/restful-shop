@@ -13,6 +13,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private String roleName;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true)
+    private UserRole roleName;
 }
