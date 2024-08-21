@@ -7,6 +7,7 @@ import com.oseanchen.crudproject.model.Role;
 import com.oseanchen.crudproject.model.User;
 import com.oseanchen.crudproject.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +18,10 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
-
     @Autowired
     private RoleDao roleDao;
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public List<User> getUsers() {
         return userDao.findAll();
@@ -32,12 +34,13 @@ public class UserService {
     @Transactional
     public User createUser(UserRequest userRequest) {
         Set<Role> roles = new HashSet<>();
-        List<String> roleList = Arrays.asList(UserRole.ROLE_BUYER.name(), UserRole.ROLE_SELLER.name());
-        for (String role : roleList) {
+        List<UserRole> roleList = Arrays.asList(UserRole.ROLE_BUYER, UserRole.ROLE_SELLER);
+        for (UserRole role : roleList) {
             Role defaultRole = roleDao.findByRoleName(role)
                     .orElseThrow(() -> new RuntimeException("Default role not found"));
             roles.add(defaultRole);
         }
+        userRequest.setPassword(encoder.encode(userRequest.getPassword()));
         User user = convertToModel(userRequest);
         user.getRoles().addAll(roles);
         return userDao.save(user);

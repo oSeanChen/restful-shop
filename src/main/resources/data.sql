@@ -1,10 +1,9 @@
--- Insert sample categories
 INSERT INTO categories (id, category_name)
 VALUES (1, 'Peripherals'),
        (2, 'Monitors'),
        (3, 'Accessories');
 
--- Insert sample suppliers
+
 INSERT INTO suppliers (id, supplier_name)
 VALUES (1, 'TechSupply Inc.'),
        (2, 'GadgetWorld Ltd.'),
@@ -23,21 +22,18 @@ VALUES ('Wireless Mouse', 1, 1, 24.99, 150, FALSE),
        ('Laptop Stand', 2, 3, 39.99, 100, FALSE);
 
 
-INSERT INTO users (username, password, email)
-VALUES
-    ('sean', 'sean123', 'sean@123.com'),
-    ('tom', 'tom123','sean@123.com');
-
-
 INSERT INTO roles (role_name)
-VALUES
-    ('ROLE_ADMIN'),
-    ('ROLE_BUYER'),
-    ('ROLE_SELLER');
+VALUES ('ROLE_ADMIN'),
+       ('ROLE_BUYER'),
+       ('ROLE_SELLER');
+
+
+INSERT INTO users (username, password, email)
+VALUES ('sean', '$2a$12$mFSlwQOLol1GVckj4W2OFurUU2xw7SCPusRcTj/97Jk.lZjvEF0xi', 'sean@123.com'),
+       ('tom', '$2a$12$kACHlPymNtIU.KXvWV2a8OlCK7h.Y8aQBrXcOHFO5mGy9gQxlceay', 'tom@123.com');
 
 INSERT INTO user_roles (user_id, role_id)
-VALUES
-    (1, 1),
-    (1, 2),
-    (2, 2),
-    (2, 3);
+VALUES (1, 1),
+       (1, 2),
+       (2, 2),
+       (2, 3);

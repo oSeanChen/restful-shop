@@ -1,8 +1,8 @@
 package com.oseanchen.crudproject.service;
 
 import com.oseanchen.crudproject.dao.ProductDao;
-import com.oseanchen.crudproject.model.Product;
 import com.oseanchen.crudproject.dto.ProductRequest;
+import com.oseanchen.crudproject.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +32,7 @@ public class ProductService {
     public Product updateProduct(Integer id, ProductRequest productRequest) {
         Optional<Product> product = getProductById(id);
         if (product.isPresent()) {
-            Product updatedProduct = converToModel(productRequest);
+            Product updatedProduct = convertToModel(productRequest);
             updatedProduct.setId(id);
             return productDao.save(updatedProduct);
         }
@@ -42,7 +41,7 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(ProductRequest productRequest) {
-        Product product = converToModel(productRequest);
+        Product product =  convertToModel(productRequest);
         return productDao.save(product);
     }
 
@@ -70,7 +69,7 @@ public class ProductService {
         return products;
     }
 
-    private Product converToModel(ProductRequest productRequest) {
+    public Product convertToModel(ProductRequest productRequest) {
         Product product = new Product();
         product.setProductName(productRequest.getProductName());
         product.setUnitPrice(productRequest.getUnitPrice());
