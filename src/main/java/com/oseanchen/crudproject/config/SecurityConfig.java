@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests((registry) -> registry
                         .requestMatchers(HttpMethod.POST, "/register", "/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/error", "/api/products/**").permitAll()   //指定路徑允許所有用戶訪問，不需身份驗證
+                        .requestMatchers(HttpMethod.GET, "/error", "/api/products/**", "/who-am-i").permitAll()   //指定路徑允許所有用戶訪問，不需身份驗證
                         .requestMatchers(HttpMethod.GET, "/checkAuthentication").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER", "ROLE_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products").hasAuthority("ROLE_SELLER")
                         .requestMatchers(HttpMethod.DELETE, "/api/products").hasAuthority("ROLE_BUYER")

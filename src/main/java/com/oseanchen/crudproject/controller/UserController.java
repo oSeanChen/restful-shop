@@ -1,17 +1,21 @@
 package com.oseanchen.crudproject.controller;
 
 import com.oseanchen.crudproject.dto.UserLoginRequest;
+import com.oseanchen.crudproject.dto.UserLoginResponse;
 import com.oseanchen.crudproject.dto.UserRequest;
 import com.oseanchen.crudproject.model.User;
 import com.oseanchen.crudproject.service.JwtService;
+import com.oseanchen.crudproject.service.MyUserDetailsService;
 import com.oseanchen.crudproject.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +32,9 @@ public class UserController {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private MyUserDetailsService userDetailsService;
 
     @GetMapping("/api/users")
     public ResponseEntity<List<User>> getUsers() {
@@ -52,21 +59,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserLoginRequest userRequest) throws Exception {
-        try {
+    public UserLoginResponse login(@RequestBody UserLoginRequest userRequest) throws Exception {
+//        try {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(userRequest.getUsername(), userRequest.getPassword()));
 
             if (authentication.isAuthenticated()) {
-                return jwtService.generateToken(authentication);
+                String jwtToken = jwtService.generateToken(authentication);
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                return UserLoginResponse.of(jwtToken, authentication);
             } else {
-                return "Login failed";
+//                return "Login failed";
+                throw new BadCredentialsException("Authentication fails because of incorrect password.");
             }
 
-        } catch (Exception e) {
+//        } catch (Exception e) {
 //            e.printStackTrace();
-            return e.getMessage() + " login fail";
-        }
+//            return e.getMessage() + " login fail";
+//        }
     }
 
     @DeleteMapping("/api/users/{id}")
