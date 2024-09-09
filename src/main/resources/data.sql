@@ -30,10 +30,12 @@ VALUES ('ROLE_ADMIN'),
 
 INSERT INTO users (username, password, email)
 VALUES ('sean', '$2a$12$mFSlwQOLol1GVckj4W2OFurUU2xw7SCPusRcTj/97Jk.lZjvEF0xi', 'sean@123.com'),
-       ('tom', '$2a$12$kACHlPymNtIU.KXvWV2a8OlCK7h.Y8aQBrXcOHFO5mGy9gQxlceay', 'tom@123.com');
+       ('tom', '$2a$12$kACHlPymNtIU.KXvWV2a8OlCK7h.Y8aQBrXcOHFO5mGy9gQxlceay', 'tom@123.com'),
+       ('ken', '$2a$12$MJlLKxkDAQCzS1MsTcns5OWWBudzaZUsAS7E.ja15sNiyjTavZhqO', 'ken@123.com');
 
 INSERT INTO user_roles (user_id, role_id)
 VALUES (1, 1),
        (1, 2),
+       (1, 3),
        (2, 2),
        (2, 3);

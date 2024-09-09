@@ -1,6 +1,8 @@
 package com.oseanchen.crudproject.config;
 
+import com.oseanchen.crudproject.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,7 +28,6 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
-
     @Bean
     public AuthenticationProvider authProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -36,21 +37,27 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests((registry) -> registry //對所有訪問HTTP端點的HttpServletRequest進行限制
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .csrf(customizer -> customizer.disable())
+                .authorizeHttpRequests((registry) -> registry
                         .requestMatchers(HttpMethod.POST, "/register", "/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/error").permitAll()   //指定路徑允許所有用戶訪問，不需身份驗證
-                        .requestMatchers(HttpMethod.GET, "/api/products").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER")
-                        .requestMatchers(HttpMethod.GET, "/checkAuthentication").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER")
-                        .requestMatchers(HttpMethod.POST, "/api/products").hasAuthority( "ROLE_SELLER")
+                        .requestMatchers(HttpMethod.GET, "/error", "/api/products/**").permitAll()   //指定路徑允許所有用戶訪問，不需身份驗證
+                        .requestMatchers(HttpMethod.GET, "/checkAuthentication").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER", "ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasAuthority("ROLE_SELLER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products").hasAuthority("ROLE_BUYER")
+                        .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN") // 任何 /api/users 開頭的，且所有方法都算
 //                        .requestMatchers(HttpMethod.GET, "/api/users/?*").hasAuthority("ROLE_ADMIN") // 只有 /api/users/{id} 才算
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAuthority("ROLE_ADMIN") // 任何 /api/users 開頭的
                         .anyRequest().authenticated()//其他尚未匹配到的路徑都需要身份驗證
                 )
-                .httpBasic(Customizer.withDefaults()) // HTTP Basic 身份驗證作為默認的驗證方式
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(Customizer.withDefaults());
-        return http.build();
+//                .httpBasic(Customizer.withDefaults()) // HTTP Basic 身份驗證作為默認的驗證方式
+//                .formLogin(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
     }
 }
