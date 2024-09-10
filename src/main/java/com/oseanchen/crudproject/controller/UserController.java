@@ -1,5 +1,6 @@
 package com.oseanchen.crudproject.controller;
 
+import com.oseanchen.crudproject.dto.ErrorResponse;
 import com.oseanchen.crudproject.dto.UserLoginRequest;
 import com.oseanchen.crudproject.dto.UserLoginResponse;
 import com.oseanchen.crudproject.dto.UserRequest;
@@ -59,24 +60,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserLoginResponse login(@RequestBody UserLoginRequest userRequest) throws Exception {
-//        try {
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest userRequest) throws Exception {
+        try {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(userRequest.getUsername(), userRequest.getPassword()));
-
             if (authentication.isAuthenticated()) {
-                String jwtToken = jwtService.generateToken(authentication);
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                return UserLoginResponse.of(jwtToken, authentication);
+                String token = jwtService.generateToken(authentication);
+                return ResponseEntity.status(HttpStatus.OK).body(UserLoginResponse.of(token, authentication));
             } else {
-//                return "Login failed";
-                throw new BadCredentialsException("Authentication fails because of incorrect password.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("Login failed", "Authentication failed"));
             }
-
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return e.getMessage() + " login fail";
-//        }
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Login failed", "Incorrect username or password"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Login failed", "An unexpected error occurred"));
+        }
     }
 
     @DeleteMapping("/api/users/{id}")

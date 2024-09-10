@@ -1,14 +1,12 @@
 package com.oseanchen.crudproject.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class UserLoginResponse {
     private String token;
     private String username;

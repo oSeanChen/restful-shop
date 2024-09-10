@@ -33,7 +33,7 @@ public class WelcomeController {
     public Map<String, Object> whoAmI(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         String token = authorization.substring(BEARER_PREFIX.length());
         try {
-            return jwtService.parseToken(token);
+            return jwtService.extractAllClaims(token);
         } catch (JwtException e) {
             throw new BadCredentialsException(e.getMessage(), e);
         }
