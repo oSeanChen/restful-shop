@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.oseanchen</groupId>
-    <artifactId>crudProject</artifactId>
+    <artifactId>restful-shop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>crudProject</name>
-    <description>crudProject</description>
+    <name>restful-shop</name>
+    <description>restful-shop</description>
     <url/>
     <licenses>
         <license/>
