@@ -56,15 +56,15 @@ public class JwtService {
 
     }
 
+    public Key getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public Claims extractAllClaims(String token) throws JwtException {
         return Jwts.parser()
                 .setSigningKey(getKey())
                 .build().parseClaimsJws(token).getBody();
-    }
-
-    public Key getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {

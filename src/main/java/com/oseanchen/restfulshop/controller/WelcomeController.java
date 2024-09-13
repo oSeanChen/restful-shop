@@ -29,8 +29,8 @@ public class WelcomeController {
         return authentication;
     }
 
-    @GetMapping("/who-am-i")
-    public Map<String, Object> whoAmI(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    @GetMapping("/extractJwt")
+    public Map<String, Object> extractJwt(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         String token = authorization.substring(BEARER_PREFIX.length());
         try {
             return jwtService.extractAllClaims(token);
