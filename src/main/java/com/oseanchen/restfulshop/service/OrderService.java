@@ -5,6 +5,7 @@ import com.oseanchen.restfulshop.dao.OrderItemDao;
 import com.oseanchen.restfulshop.dao.ProductDao;
 import com.oseanchen.restfulshop.dto.BuyItem;
 import com.oseanchen.restfulshop.dto.CreateOrderInfoRequest;
+import com.oseanchen.restfulshop.dto.CreateOrderResponse;
 import com.oseanchen.restfulshop.model.OrderInfo;
 import com.oseanchen.restfulshop.model.OrderItem;
 import com.oseanchen.restfulshop.model.Product;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public class OrderService {
     private ProductDao productDao;
 
     @Transactional
-    public Integer createOrder(Integer userId, CreateOrderInfoRequest createOrderInfoRequest) {
+    public CreateOrderResponse createOrder(Integer userId, CreateOrderInfoRequest createOrderInfoRequest) {
 
         // 計算價錢
         Double totalAmount = 0.0;
@@ -56,7 +58,9 @@ public class OrderService {
         int orderInfoId = orderInfoSaved.getId();
 
         // 存多筆 orderItem
+        List<HashMap<String, Object>> responseOrderItemList = new ArrayList<>();
         for (OrderItem orderItem : orderItemList) {
+            HashMap<String, Object> map = new HashMap<>();
             Product product = productDao.findById(orderItem.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -67,8 +71,17 @@ public class OrderService {
 
             orderItem.setOrderInfoId(orderInfoId);
             orderItemDao.save(orderItem);
+
+            map.put("orderItem", orderItem);
+            map.put("productName", product.getProductName());
+            responseOrderItemList.add(map);
         }
 
-        return orderInfoId;
+        CreateOrderResponse createOrderResponse = new CreateOrderResponse();
+        createOrderResponse.setOrderInfo(orderInfoSaved);
+
+        createOrderResponse.setOrderItemList(responseOrderItemList);
+
+        return createOrderResponse;
     }
 }

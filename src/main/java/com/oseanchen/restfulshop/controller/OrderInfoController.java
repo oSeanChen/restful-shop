@@ -1,6 +1,8 @@
 package com.oseanchen.restfulshop.controller;
 
 import com.oseanchen.restfulshop.dto.CreateOrderInfoRequest;
+import com.oseanchen.restfulshop.dto.CreateOrderResponse;
+import com.oseanchen.restfulshop.model.OrderInfo;
 import com.oseanchen.restfulshop.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ public class OrderInfoController {
     @PostMapping("/users/{userId}/orders")
     public ResponseEntity<?> createOrder(@PathVariable Integer userId,
                                          @RequestBody @Valid CreateOrderInfoRequest createOrderInfoRequest) {
-        Integer orderId = orderService.createOrder(userId, createOrderInfoRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderId);
+        CreateOrderResponse createOrderResponse = orderService.createOrder(userId, createOrderInfoRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createOrderResponse);
     }
 }
