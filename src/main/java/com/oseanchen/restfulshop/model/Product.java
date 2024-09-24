@@ -18,9 +18,6 @@ public class Product extends BaseEntity {
     private Boolean discontinued = false;
 
     @ManyToOne
-    private Category category;
-
-    @ManyToOne
     private Supplier supplier;
 
 }

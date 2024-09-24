@@ -1,6 +1,5 @@
 package com.oseanchen.restfulshop.dto;
 
-import com.oseanchen.restfulshop.model.Category;
 import com.oseanchen.restfulshop.model.Supplier;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,9 +24,6 @@ public class ProductRequest {
 
     @NotNull
     private Boolean discontinued;
-
-    @NotNull
-    private Category category;
 
     @NotNull
     private Supplier supplier;

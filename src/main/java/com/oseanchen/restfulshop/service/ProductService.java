@@ -76,7 +76,6 @@ public class ProductService {
         product.setUnitsInStock(productRequest.getUnitsInStock());
         product.setDiscontinued(productRequest.getDiscontinued());
         product.setSupplier(productRequest.getSupplier());
-        product.setCategory(productRequest.getCategory());
         return product;
     }
 }
