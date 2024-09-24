@@ -1,11 +1,3 @@
-CREATE TABLE categories
-(
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL,
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
 CREATE TABLE suppliers
 (
     id            INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,11 +13,9 @@ CREATE TABLE products
     unit_price     DECIMAL(10, 2),
     units_in_stock INT,
     discontinued   BOOLEAN   DEFAULT FALSE,
-    category_id    INT,
     supplier_id    INT,
     created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories (id),
     FOREIGN KEY (supplier_id) REFERENCES suppliers (id)
 );
 
@@ -52,4 +42,22 @@ CREATE TABLE user_roles
     PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (role_id) REFERENCES roles (id)
+);
+
+CREATE TABLE order_info
+(
+    id                 INT       NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    user_id            INT       NOT NULL,
+    total_amount       DECIMAL(10, 2)  NOT NULL, -- 訂單總花費
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE order_item
+(
+    id            INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    order_info_id INT NOT NULL,
+    product_id    INT NOT NULL,
+    quantity      INT NOT NULL, -- 商品數量
+    amount        DECIMAL(10, 2) NOT NULL  -- 商品花費
 );
