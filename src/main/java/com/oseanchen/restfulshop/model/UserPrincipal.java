@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 public class UserPrincipal implements UserDetails {
 
     private User user;
@@ -24,6 +23,10 @@ public class UserPrincipal implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                 .collect(Collectors.toSet());
         return authorities;
+    }
+
+    public Integer getId() {
+        return user.getId();
     }
 
     @Override
