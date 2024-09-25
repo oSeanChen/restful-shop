@@ -1,6 +1,8 @@
 package com.oseanchen.restfulshop.config;
 
 import com.oseanchen.restfulshop.model.UserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,7 @@ import java.util.function.Supplier;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -57,7 +60,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/api/products").hasAuthority("ROLE_SELLER")
                                 .requestMatchers("/api/users/*").hasAuthority("ROLE_ADMIN") // 任何 /api/users 開頭的，且所有方法都算
 //                        .requestMatchers(HttpMethod.POST, "/api/users/*/orders").hasAnyAuthority("ROLE_BUYER")
-                                .requestMatchers(HttpMethod.POST, "/api/users/{userId}/orders").access(this::hasUserIdMatchOrIsAdmin)
+                                .requestMatchers(HttpMethod.POST, "/api/users/{userId}/orders").access(this::checkUserIdAndRole)
                                 .anyRequest().authenticated()//其他尚未匹配到的路徑都需要身份驗證
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -65,15 +68,20 @@ public class SecurityConfig {
                 .build();
     }
 
-    private AuthorizationDecision hasUserIdMatchOrIsAdmin(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
+    private AuthorizationDecision checkUserIdAndRole(Supplier<Authentication> authentication, RequestAuthorizationContext context) {
         int userId = Integer.parseInt(context.getVariables().get("userId"));
         Authentication auth = authentication.get();
-        UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
+        // 轉型問題處理
+        if (!(auth.getPrincipal() instanceof UserPrincipal userPrincipal)) {
+            return new AuthorizationDecision(false);
+        }
 
         boolean hasAccess = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")) ||
                 // 當前 userId 對應路徑 userId 才允許授權
                 (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BUYER")) && userPrincipal.getId().equals(userId));
+
+        log.info("checkUserIdAndRole access permit: {}", hasAccess);
         return new AuthorizationDecision(hasAccess);
     }
 }

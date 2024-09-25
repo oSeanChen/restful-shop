@@ -9,17 +9,21 @@ import com.oseanchen.restfulshop.dto.CreateOrderResponse;
 import com.oseanchen.restfulshop.model.OrderInfo;
 import com.oseanchen.restfulshop.model.OrderItem;
 import com.oseanchen.restfulshop.model.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     @Autowired
     private OrderInfoDao orderInfoDao;
 
@@ -37,15 +41,29 @@ public class OrderService {
         List<OrderItem> orderItemList = new ArrayList<>();
 
         for (BuyItem buyItem : createOrderInfoRequest.getBuyItemList()) {
-            Optional<Product> product = productDao.findById(buyItem.getProductId());
+            Product product = productDao.findById(buyItem.getProductId())
+                    .orElseThrow(() -> {
+                        log.warn("productId: {} not found", buyItem.getProductId());
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                    });
 
-            double amount = (buyItem.getQuantity() * product.get().getUnitPrice());
+            if (product.getUnitsInStock() < buyItem.getQuantity()) {
+                log.warn("productId: {} stock is not enough, remaining stock is {}, requested quantity is {}", buyItem.getProductId(), product.getUnitsInStock(), buyItem.getQuantity());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+
+            double amount = (buyItem.getQuantity() * product.getUnitPrice());
             totalAmount += amount;
 
             OrderItem orderItem = new OrderItem();
             orderItem.setProductId(buyItem.getProductId());
             orderItem.setQuantity(buyItem.getQuantity());
             orderItem.setAmount(amount);
+
+            // 扣庫存
+            int updateStock = product.getUnitsInStock() - orderItem.getQuantity();
+            product.setUnitsInStock(updateStock);
+            productDao.save(product);
 
             orderItemList.add(orderItem);
         }
@@ -58,28 +76,26 @@ public class OrderService {
         int orderInfoId = orderInfoSaved.getId();
 
         // 存多筆 orderItem
+        orderItemList.forEach(item -> item.setOrderInfoId(orderInfoId));
+        orderItemDao.saveAll(orderItemList);
+
+        // response
         List<HashMap<String, Object>> responseOrderItemList = new ArrayList<>();
         for (OrderItem orderItem : orderItemList) {
             HashMap<String, Object> map = new HashMap<>();
-            Product product = productDao.findById(orderItem.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            Product product = productDao.findById(orderItem.getProductId()).get();
 
-            // 扣庫存
-            int updateStock = product.getUnitsInStock() - orderItem.getQuantity();
-            product.setUnitsInStock(updateStock);
-            productDao.save(product);
-
-            orderItem.setOrderInfoId(orderInfoId);
-            orderItemDao.save(orderItem);
-
-            map.put("orderItem", orderItem);
+            map.put("orderItemId", orderItem.getId());
+            map.put("orderInfoId", orderItem.getOrderInfoId());
+            map.put("productId", orderItem.getProductId());
+            map.put("quantity", orderItem.getQuantity());
+            map.put("amount", orderItem.getAmount());
             map.put("productName", product.getProductName());
             responseOrderItemList.add(map);
         }
 
         CreateOrderResponse createOrderResponse = new CreateOrderResponse();
         createOrderResponse.setOrderInfo(orderInfoSaved);
-
         createOrderResponse.setOrderItemList(responseOrderItemList);
 
         return createOrderResponse;
