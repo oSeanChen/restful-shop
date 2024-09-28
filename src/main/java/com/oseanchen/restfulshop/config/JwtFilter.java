@@ -1,6 +1,5 @@
 package com.oseanchen.restfulshop.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oseanchen.restfulshop.service.JwtService;
 import com.oseanchen.restfulshop.service.MyUserDetailsService;
 import io.jsonwebtoken.JwtException;
@@ -13,16 +12,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -35,7 +28,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     MyUserDetailsService myUserDetailsService;
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

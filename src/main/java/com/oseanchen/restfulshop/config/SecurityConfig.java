@@ -61,6 +61,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/users/*").hasAuthority("ROLE_ADMIN") // 任何 /api/users 開頭的，且所有方法都算
 //                        .requestMatchers(HttpMethod.POST, "/api/users/*/orders").hasAnyAuthority("ROLE_BUYER")
                                 .requestMatchers(HttpMethod.POST, "/api/users/{userId}/orders").access(this::checkUserIdAndRole)
+                                .requestMatchers( "/v3/api-docs/**","/swagger-ui/**").permitAll()
                                 .anyRequest().authenticated()//其他尚未匹配到的路徑都需要身份驗證
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
