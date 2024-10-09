@@ -50,10 +50,6 @@ public class ProductService {
         productDao.deleteById(id);
     }
 
-    public List<Product> searchProducts(String productName) {
-        return productDao.findByProductName(productName);
-    }
-
     public List<Product> searchAndSortProducts(String productName, String sortBy, String sortOrder, int page, int limit) {
         Sort sort = sortOrder.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, limit, sort);
