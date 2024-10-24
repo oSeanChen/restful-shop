@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - restfulshop-network
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: restfulshop
+    ports:
+      - "3305:3306"
+    networks:
+      - restfulshop-network
+    volumes:
+      - mysql-restfulshop-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost", "--password=root" ]
+      retries: 10
+      interval: 3s
+      timeout: 30s
+
+# Network
+networks:
+  restfulshop-network:
+    driver: bridge
+
+volumes:
+  mysql-restfulshop-data:

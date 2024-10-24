@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS restfulshop;
+USE restfulshop;
+
 CREATE TABLE suppliers
 (
     id            INT AUTO_INCREMENT PRIMARY KEY,
